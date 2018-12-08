@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgren.springboot_mybatisplus_swagger.mapper.TeacherMapper">
+
+  <sql id="Base_Column_List">
+    id, username, password, real_name, subject, job_title, birthday, clazz_id
+  </sql>
+
+  <!-- 通用查询映射结果 -->
+  <resultMap id="BaseResultMap" type="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="password" property="password"/>
+    <result column="real_name" property="realName"/>
+    <result column="subject" property="subject"/>
+    <result column="job_title" property="jobTitle"/>
+    <result column="birthday" property="birthday"/>
+    <result column="clazz_id" property="clazzId"/>
+    <result column="tag" property="tag"/>
+  </resultMap>
+
+  <!-- 通用查询映射结果 -->
+  <resultMap id="teacherWithCity" type="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="password" property="password"/>
+    <result column="real_name" property="realName"/>
+    <result column="subject" property="subject"/>
+    <result column="job_title" property="jobTitle"/>
+    <result column="birthday" property="birthday"/>
+    <result column="clazz_id" property="clazzId"/>
+    <result column="tag" property="tag"/>
+    <collection column="{userId=id}" property="userCityList"
+                ofType="com.lgren.springboot_mybatisplus_swagger.service.impl.TagLeafServiceImpl"
+                select="com.lgren.springboot_mybatisplus_swagger.mapper.UserCityMapper.selectByUserId"/>
+  </resultMap>
+
+  <insert id="insertBatch" parameterType="java.util.Set">
+    INSERT INTO teacher(<include refid="Base_Column_List"/>)
+    VALUES
+    <foreach collection="list" index="index" item="item" separator=",">
+      (#{item.id}, #{item.username}, #{item.password}, #{item.realName}, #{item.subject}, #{item.jobTitle},
+      #{item.birthday}, #{item.clazzId})
+    </foreach>
+  </insert>
+  <select id="testSelect" resultType="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    SELECT t.*
+    FROM `teacher` t
+    left JOIN clazz c ON t.clazz_id=c.id
+    where c.class_name = "邂逅"
+  </select>
+  <select id="testSelectTwo" resultType="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    SELECT * FROM `teacher` where clazz_id in (select id from clazz where class_name = "邂逅")
+  </select>
+  <select id="testSelectThree" resultType="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    SELECT t.* FROM `teacher` t,`clazz` c where t.clazz_id = c.id and class_name = "邂逅";
+  </select>
+  <select id="testSelectFour" resultType="com.lgren.springboot_mybatisplus_swagger.entity.Teacher">
+    select * from teacher t where
+    exists (select id from clazz c where c.class_name = "邂逅" and t.clazz_id = c.id)
+  </select>
+
+  <select id="selectWithCity" resultMap="teacherWithCity">
+    select * from teacher where 1=1
+    <if test="id != null">
+      and id = #{id}
+    </if>
+  </select>
+
+  <select id="selectListWithCity" parameterType="java.util.List" resultMap="teacherWithCity">
+    select * from teacher where id in
+    <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+
+</mapper>

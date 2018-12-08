@@ -1,0 +1,82 @@
+server:
+  port: 8082
+# DataSource Config
+spring:
+  datasource:
+#    driver-class-name: org.h2.Driver
+#    schema: classpath:db/schema-h2.sql
+#    data: classpath:db/data-h2.sql
+#    url: jdbc:h2:mem:test
+#    username: root
+#    password: test
+
+    url: jdbc:mysql://localhost:3306/school?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    #连接池的配置信息
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 初始化，最小，最大连接数
+    initial-size: 3
+    min-idle: 3
+    max-active: 18
+    # 获取数据库连接等待的超时时间
+    max-wait: 60000
+    # 配置多久进行一次检测，检测需要关闭的空闲连接 单位毫秒
+    time-between-eviction-runs-millis: 60000
+    test-while-idle: true
+    validation-query: SELECT 1
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: 172.16.4.112
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password: ''
+    jedis:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: -1
+        # 连接池中的最大空闲连接
+        max-idle: 30
+        # 连接池中的最小空闲连接
+        min-idle: 0
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+    timeout: 0ms
+    #filters=stat,wall,log4j
+  freemarker:
+    allow-request-override: false
+    cache: false
+    check-template-location: true
+    charset: UTF-8
+    content-type: text/html; charset=utf-8
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: false
+    suffix: .ftl
+    template-loader-path: classpath:/templates/
+  servlet:
+      multipart:
+        # 上传单个文件大小
+        max-file-size: 10MB
+        # 一次请求大小
+        max-request-size: 100MB
+
+mybatis-plus:
+  mapper-locations: classpath*:com/lgren/springboot_mybatisplus_swagger/mapper/*.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  type-aliases-package: com.lgren.springboot_mybatisplus_swagger.entity
+  #自动使用枚举
+#  type-enums-package: com.lgren.springboot_mybatisplus_swagger.entity.enums
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      #主键类型  0:"数据库ID自增", 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID";
+      id-type: ID_WORKER
+      #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+      field-strategy: NOT_EMPTY
+    #刷新mapper 调试神器
+    refresh: true
